@@ -1,0 +1,230 @@
+<!-- 
+Note! 
+-1 = Empty!!! 
+
+define on = true
+define off = false
+-->
+
+<!--<html style="overflow:hidden; height:100%">-->
+<html style="height:100%">
+	<head>
+		<title>LSS Mission Generator</title>
+		<meta charset="utf-8" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="arr.js"></script>
+		<script src="main.js"></script>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+	
+		
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+		<style>
+		body
+		{
+			margin: 50px;
+		}
+		p {display: inline}
+		input {display: inline}
+		</style>
+	</head>
+	<body>
+
+		<h3>Notiz: Es kann nur die Einsatzdauer für Feuerwehr <b>ODER</b> Polizei genutzt werden</h3>
+		<h4><br/>Für die nicht genutzte Einträge bitte -1 angeben<br/></br></h4>
+		<form id="neededValues">
+			<p>Einsatzname:</p> <input id="caption" placeholder="Name des Einsatzes"><br/>
+			
+			<!--Einsatzdauer Feuerwehr: --><input id="fire_value" type="number" min="-1" value="0" hidden> <!--in Minuten<br/>-->
+			<!--Einsatzdauer Polizei: --><input id="police_value" type="number" min="-1" value="0" hidden> <!--in Minuten<br/>-->
+			
+			Einsatzdauer <select id="frak"><option id="fire">Feuerwehr</option><option id="police">Polizei</option></select>: <input id="fp_value" type="number" min="-1" value="0"> in Minuten<br/>
+			Vergütung: <input id="credits" type="number" min="0" value="0" step="50"><br/>
+			Min. Feuerwachen: <input id="feuerwache_count" type="number" min="0" value="0"><br/>
+			Min. Rettungswachen: <input id="rettungswache_count" type="number" min="0" value="0"><br/>
+			Max. Rettungswachen: <input id="max_rettungswache_building" type="number" min="-1" value="0"><br/>
+			Min. Polizeiwachen: <input id="police_count" type="number" min="0" value="0"><br/>
+			Max. Polizeiwachen: <input id="max_police_building" type="number" min="-1" value="0"><br/>
+			POI: <select id="poi_type"></select><br/>
+			Icon: 
+			<select id="icon">
+				<option id="fire">Feuer</option>
+				<option id="caraccident">Autounfall</option>
+				<option id="oil">Öl</option>
+				<option id="blast">Explosion</option>
+				<option id="bar_coktail">Cocktail</option>
+				<option id="medicalstore">Medizinisch</option>
+				<option id="theft">Diebstahl</option>
+				<option id="constructioncrane">Kran</option>
+				<option id="baseball">Angriff</option>
+				<option id="cat">Tier</option>
+				<option id="museum_art">Museum</option>
+				<option id="dancinghall">Diskothek</option>
+				<option id="river">Fluss</option>
+				<option id="bus">Bus</option>
+			</select><br/>
+			Fraktion: 
+			<select id="main_building">
+				<option id="Building::BUILDING_TYPE_FEUERWACHE">Feuerwehr</option>
+				<option id="Building::BUILDING_TYPE_RETTUNGSWACHE">Rettungsdienst</option>
+				<option id="Building::BUILDING_TYPE_POLIZEIWACHE">Polizei</option>
+			</select><br/><br/>
+			Dauerhafter Einsatz: <input id="static" type="checkbox" checked><br/>
+			
+			<p id="text1">Einsatz tritt nur vom</p> <input id="date_start" type="date"><br/><!-- DateTime.new(2013,2,5) (Split date at "-")-->
+			<p id="text2">bis zum</p> <input id="date_end" type="date"> <p id="text3">auf.</p><!-- DateTime.new(2013,2,5) (Split date at "-")-->
+			
+			<script>
+				$('#static').on('change', function(){
+					dateHide();
+				});
+			</script>
+			
+			<br/>
+			<br/>
+			Benötigte LFs: <input id="need_lf" type="number" min="0" value="0"><br/>
+			<p>LF Wahrscheinlichkeit:</p> <input id="need_lf_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			RW/GKW statt LF: <input id="allow_rw_instead_of_lf" type="checkbox"><br/><br/>
+			
+			Benötigte ELW1: <input id="need_elw1" type="number" min="0" value="0"><br/>
+			<p>ELW1 Wahrscheinlichkeit:</p> <input id="need_elw1_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte ELW2: <input id="need_elw2" type="number" min="0" value="0"><br/>
+			<p>ELW2 Wahrscheinlichkeit:</p> <input id="need_elw2_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte DLK: <input id="need_dlk" type="number" min="0" value="0"><br/>
+			<p>DLK Wahrscheinlichkeit:</p> <input id="need_dlk_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte Rüstwagen: <input id="need_rw" type="number" min="0" value="0"><br/>
+			<p>Rüstwagen Wahrscheinlichkeit:</p> <input id="need_rw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte Schlauchwagen: <input id="need_gwl2wasser" type="number" min="0" value="0"><br/>
+			<p>Schlauchwagen Wahrscheinlichkeit:</p> <input id="need_gwl2wasser_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			<p>Benötigte GW-A:</p> <input id="need_gwa" type="number" min="0" value="0"><br/>
+			<p>GW-A Wahrscheinlichkeit:</p> <input id="need_gwa_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte GW-Öl: <input id="need_gwoil" type="number" min="0" value="0"><br/>
+			<p>GW-Öl Wahrscheinlichkeit:</p> <input id="need_gwoil_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte GW-Mess: <input id="need_gwmess" type="number" min="0" value="0"><br/>
+			<p>GW-Mess Wahrscheinlichkeit:</p> <input id="need_gwmess_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte GW-Gefahrgut: <input id="need_gwgefahrgut" type="number" min="0" value="0"><br/>
+			<p>GW-Gefahrgut Wahrscheinlichkeit:</p> <input id="need_gwgefahrgut_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/><br/>
+			
+			Benötigte GW-Höhenrettung: <input id="need_gwhoehenrettung" type="number" min="0" value="0"><br/>
+			<p>GW-Höhenrettung Wahrscheinlichkeit:</p> <input id="need_gwhoehenrettung_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Dekon-P: <input id="need_dekon_p" type="number" min="0" value="0"><br/>
+			<p>Dekon-P Wahrscheinlichkeit:</p> <input id="need_dekon_p_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Kräne: <input id="need_fwk" type="number" min="0" value="0"><br/>
+			<p>Kran Wahrscheinlichkeit:</p> <input id="need_fwk_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Flugfeldlöschfahrzeuge: <input id="need_arff" type="number" min="0" value="0"><br/>
+			<p>Flugfeldlöschfahrzeug Wahrscheinlichkeit:</p> <input id="need_arff_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Rettungstreppen: <input id="need_rettungstreppe" type="number" min="0" value="0"><br/>
+			<p>Rettungstreppen Wahrscheinlichkeit:</p> <input id="need_rettungstreppe_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+		
+			<!--Benötigtes Feuerwehr Personal: <input id="personal_min_feuerwehr" type="number" min="0"><br/>-->
+			
+			
+			<br/>
+			Mindestanzahl Patienten: <input id="possible_patient_min" type="number" min="0" value="0"><br/>
+			Maximalanzahl Patienten: <input id="possible_patient" type="number" min="0" value="0"><br/>
+			Fachrichtung: 
+			<select id="patient_extension_id">
+				<option id="none">
+				<option id="0">Allgemeine Innere</option>
+				<option id="1">Allgemeine Chirurgie</option>
+				<option id="2">Gynäkologie</option>
+				<option id="3">Urologie</option>
+				<option id="4">Unfallchirurgie</option>
+				<option id="5">Neurologie</option>
+				<option id="6">Neurochirurgie</option>
+				<option id="7">Kardiologie</option>
+				<option id="8">Kardiochirurgie</option>
+			</select><br/>
+			Patienten Geschlecht: 
+			<select id="possible_patient_gender">
+				<option id="none">M/W</option>
+				<option id="male">Männlich</option>
+				<option id="female">Weiblich</option>
+			</select><br/>
+			Patient bei Einsatzende: <input id="patient_modus" type="checkbox"><br/>
+			KTW Typ B statt RTW: <input id="allow_ktw_b_instead_of_rtw" type="checkbox"><br/>
+			KTW statt RTW: <input id="allow_ktw_instead_of_rtw" type="checkbox"><br/>
+			
+			Benötigte GW-SAN: <input id="need_gw_san" type="number" min="0" value="0"><br/>
+			<p>GW-SAN Wahrscheinlichkeit:</p> <input id="need_gw_san_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Transportwahrscheinlichkeit: <input id="transport_need_quote" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			NEF Chance: <input id="nef_need_quote" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			RTH Chance: <input id="rth_need_quote" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			<br/>
+			
+			Benötigte Streifenwagen: <input id="need_streifenwagen" type="number" min="0" value="0"><br/>
+			<p>Streifenwagen Wahrscheinlichkeit:</p> <input id="need_streifenwagen_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte FüKw: <input id="need_fukw" type="number" min="0" value="0"><br/>
+			<p>FüKw Wahrscheinlichkeit:</p> <input id="need_fukw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte leBefKw: <input id="need_lebefkw" type="number" min="0" value="0"><br/>
+			<p>leBefKw Wahrscheinlichkeit:</p> <input id="need_lebefkw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte GruKw: <input id="need_grukw" type="number" min="0" value="0"><br/>
+			<p>GruKw Wahrscheinlichkeit:</p> <input id="need_grukw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Wasserwerfer: <input id="need_wasserwerfer" type="number" min="0" value="0"><br/>
+			<p>Wasserwerfer Wahrscheinlichkeit:</p> <input id="need_wasserwerfer_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte GefKw: <input id="need_gefkw" type="number" min="0" value="0"><br/>
+			<p>GefKw Wahrscheinlichkeit:</p> <input id="need_gefkw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Polizeihubschrauber: <input id="need_polizeihubschrauber" type="number" min="0" value="0"><br/>
+			<p>Polizeihubschrauber Wahrscheinlichkeit:</p> <input id="need_polizeihubschrauber_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			<br/>
+			Maximalanzahl Gefangene: <input id="possible_prisoner" type="number" min="0" value="0"><br/>
+			<br/>
+			
+			Benötigte GKW: <input id="need_thw_gkw" type="number" min="0" value="0"><br/>
+			<p>GKW Wahrscheinlichkeit:</p> <input id="need_thw_gkw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte MzKw: <input id="need_thw_mzkw" type="number" min="0" value="0"><br/>
+			<p>MzKw Wahrscheinlichkeit:</p> <input id="need_thw_mzkw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte MTW-TZ: <input id="need_thw_mtwtz" type="number" min="0" value="0"><br/>
+			<p>MTW-TZ Wahrscheinlichkeit:</p> <input id="need_thw_mtwtz_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte LKW K9: <input id="need_thw_lkw" type="number" min="0" value="0"><br/>
+			<p>LKW K9 Wahrscheinlichkeit:</p> <input id="need_thw_lkw_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Radlader: <input id="need_thw_brmg_r" type="number" min="0" value="0"><br/>
+			<p>Radlader Wahrscheinlichkeit:</p> <input id="need_thw_brmg_r_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+			
+			Benötigte Anh DLE: <input id="need_thw_dle" type="number" min="0" value="0"><br/>
+			<p>Anh DLE Wahrscheinlichkeit:</p> <input id="need_thw_dle_chance" type="number" max="100" min="0" value="0" step="5"><p> %</p><br/>
+		</form>
+		
+		<script>
+		for(var i = 0; i < arr_poi.length; i++)
+		{			
+			$("#poi_type").append("<option id='" + arr_poi[i][0] + "'>" + arr_poi[i][1] + "</option>");
+		}
+		
+		for(var o = 0; o < vehs.length; o++)
+		{
+			$(document).ready(generate_handlerOnLoad(o));
+			$(document).ready(dateHide());
+			$('#neededValues').on('change', generate_handler(o));
+		}
+		</script>
+		
+		<button onclick="generate()">Mission generieren</button><button onclick="resetForm()">Reset</button> © Lennard[TFD]<br/>
+		
+		<textarea id="missionOutput" style="width:750px; height: 850px"></textarea>
+	</body>
+</html>
